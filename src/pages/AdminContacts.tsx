@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { DEFAULT_CONTACTS, type ContactsData } from './Home';
-import { updateContacts } from '../lib/contacts';
+import { updateContacts, useContacts } from '../lib/contacts';
 
 const FIELDS: {
   key: keyof ContactsData;
@@ -84,15 +84,24 @@ const FIELDS: {
   },
 ];
 
-export default function AdminContacts() {
-  const [form, setForm] = useState<ContactsData>(DEFAULT_CONTACTS);
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+const { data: contacts, loading: contactsLoading, error: contactsError } = useContacts();
 
-  useEffect(() => {
-    setForm(DEFAULT_CONTACTS);
-  }, []);
+const [form, setForm] = useState<ContactsData>(DEFAULT_CONTACTS);
+const [saved, setSaved] = useState(false);
+const [saving, setSaving] = useState(false);
+const [error, setError] = useState('');
+
+useEffect(() => {
+  if (contacts) {
+    setForm(contacts);
+  }
+}, [contacts]);
+
+useEffect(() => {
+  if (contactsError) {
+    setError(contactsError);
+  }
+}, [contactsError]);
 
   const handleChange = (key: keyof ContactsData, value: string) => {
     setForm((prev) => ({
