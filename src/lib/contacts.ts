@@ -120,3 +120,40 @@ export async function updateContacts(contacts: ContactsData) {
     }
   }
 }
+export async function updateContacts(data: ContactsData) {
+  const { data: existing, error: findError } = await supabase
+    .from('contacts')
+    .select('id')
+    .limit(1)
+    .maybeSingle();
+
+  if (findError) throw findError;
+
+  const payload = {
+    org_name: data.orgName,
+    addr_pyatigorsk: data.addrPyatigorsk,
+    addr_minvody: data.addrMinvody,
+    phone1: data.phone1,
+    phone2: data.phone2,
+    email: data.email,
+    hours: data.hours,
+    whatsapp: data.whatsapp,
+    telegram: data.telegram,
+    max: data.max,
+  };
+
+  if (existing) {
+    const { error } = await supabase
+      .from('contacts')
+      .update(payload)
+      .eq('id', existing.id);
+
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from('contacts')
+      .insert(payload);
+
+    if (error) throw error;
+  }
+}
