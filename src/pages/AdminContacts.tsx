@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Phone,
   Save,
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { DEFAULT_CONTACTS, type ContactsData } from './Home';
-import { updateContacts, useContacts } from '../lib/contacts';
+import { updateContacts } from '../lib/contacts';
 
 const FIELDS: {
   key: keyof ContactsData;
@@ -84,24 +84,11 @@ const FIELDS: {
   },
 ];
 
-const { data: contacts, loading: contactsLoading, error: contactsError } = useContacts();
-
-const [form, setForm] = useState<ContactsData>(DEFAULT_CONTACTS);
-const [saved, setSaved] = useState(false);
-const [saving, setSaving] = useState(false);
-const [error, setError] = useState('');
-
-useEffect(() => {
-  if (contacts) {
-    setForm(contacts);
-  }
-}, [contacts]);
-
-useEffect(() => {
-  if (contactsError) {
-    setError(contactsError);
-  }
-}, [contactsError]);
+export default function AdminContacts() {
+  const [form, setForm] = useState<ContactsData>(DEFAULT_CONTACTS);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (key: keyof ContactsData, value: string) => {
     setForm((prev) => ({
@@ -117,7 +104,6 @@ useEffect(() => {
 
     try {
       await updateContacts(form);
-
       setSaved(true);
 
       setTimeout(() => {
@@ -192,28 +178,32 @@ useEffect(() => {
       )}
 
       <div className="grid sm:grid-cols-2 gap-5">
-        {FIELDS.map((field) => (
-          <div
-            key={field.key}
-            className="bg-white/[0.04] border border-white/10 rounded-2xl p-5"
-          >
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
-              <field.icon className="w-4 h-4 text-accent-500" />
-              {field.label}
-            </label>
+        {FIELDS.map((field) => {
+          const Icon = field.icon;
 
-            <input
-              type="text"
-              value={form[field.key]}
-              placeholder={field.placeholder}
-              onChange={(e) =>
-                handleChange(field.key, e.target.value)
-              }
-              className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-accent-500 focus:outline-none transition"
-            />
-          </div>
-        ))}
+          return (
+            <div
+              key={field.key}
+              className="bg-white/[0.04] border border-white/10 rounded-2xl p-5"
+            >
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
+                <Icon className="w-4 h-4 text-accent-500" />
+                {field.label}
+              </label>
+
+              <input
+                type="text"
+                value={form[field.key]}
+                placeholder={field.placeholder}
+                onChange={(e) =>
+                  handleChange(field.key, e.target.value)
+                }
+                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-accent-500 focus:outline-none transition"
+              />
+            </div>
+          );
+        })}
       </div>
     </AdminLayout>
   );
-
+}
