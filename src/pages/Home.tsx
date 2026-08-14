@@ -29,7 +29,7 @@ import {
   DEFAULT_CONTACTS,
   type ContactsData,
   useContacts,
-} from '../lib/contacts';;
+} from '../lib/contacts';
 import type { PriceWithSubs } from '../lib/types';
 
 export interface ContactsData {
