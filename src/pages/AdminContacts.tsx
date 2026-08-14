@@ -10,10 +10,11 @@ import {
   Send,
   Maximize2,
   Mail,
+  AlertCircle,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { useContacts, updateContacts } from '../lib/contacts';
 import { DEFAULT_CONTACTS, type ContactsData } from './Home';
+import { updateContacts } from '../lib/contacts';
 
 const FIELDS: {
   key: keyof ContactsData;
@@ -84,28 +85,16 @@ const FIELDS: {
 ];
 
 export default function AdminContacts() {
-  const {
-    status,
-    data,
-    error: loadError,
-    refetch,
-  } = useContacts();
-
   const [form, setForm] = useState<ContactsData>(DEFAULT_CONTACTS);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (data) {
-      setForm(data);
-    }
-  }, [data]);
+    setForm(DEFAULT_CONTACTS);
+  }, []);
 
-  const handleChange = (
-    key: keyof ContactsData,
-    value: string
-  ) => {
+  const handleChange = (key: keyof ContactsData, value: string) => {
     setForm((prev) => ({
       ...prev,
       [key]: value,
@@ -120,15 +109,13 @@ export default function AdminContacts() {
     try {
       await updateContacts(form);
 
-      await refetch();
-
       setSaved(true);
 
       setTimeout(() => {
         setSaved(false);
       }, 2000);
     } catch (err) {
-      console.error(err);
+      console.error('Ошибка сохранения контактов:', err);
 
       setError(
         err instanceof Error
@@ -139,8 +126,6 @@ export default function AdminContacts() {
       setSaving(false);
     }
   };
-
-  const loading = status === 'loading';
 
   return (
     <AdminLayout>
@@ -156,13 +141,13 @@ export default function AdminContacts() {
           </h1>
 
           <p className="text-gray-400 mt-2">
-            Изменения сохраняются в базе данных и доступны на всех устройствах.
+            Изменения сохраняются в базе данных и будут видны всем посетителям.
           </p>
         </div>
 
         <button
           onClick={handleSave}
-          disabled={saving || loading}
+          disabled={saving}
           className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-xl transition hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 ${
             saved
               ? 'bg-green-500 text-white'
@@ -183,47 +168,43 @@ export default function AdminContacts() {
         </button>
       </div>
 
-      {loadError && (
-        <div className="mb-5 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
-          Ошибка загрузки контактов: {loadError}
-        </div>
-      )}
-
       {error && (
-        <div className="mb-5 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
-          Ошибка сохранения: {error}
-        </div>
-      )}
+        <div className="mb-6 flex items-start gap-3 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
 
-      {loading ? (
-        <div className="text-center py-16 text-gray-400">
-          Загрузка контактов...
-        </div>
-      ) : (
-        <div className="grid sm:grid-cols-2 gap-5">
-          {FIELDS.map((field) => (
-            <div
-              key={field.key}
-              className="bg-white/[0.04] border border-white/10 rounded-2xl p-5"
-            >
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
-                <field.icon className="w-4 h-4 text-accent-500" />
-                {field.label}
-              </label>
-
-              <input
-                type="text"
-                value={form[field.key]}
-                placeholder={field.placeholder}
-                onChange={(e) =>
-                  handleChange(field.key, e.target.value)
-                }
-                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-accent-500 focus:outline-none transition"
-              />
+          <div>
+            <div className="font-semibold mb-1">
+              Ошибка сохранения
             </div>
-          ))}
+
+            <div>{error}</div>
+          </div>
         </div>
       )}
+
+      <div className="grid sm:grid-cols-2 gap-5">
+        {FIELDS.map((field) => (
+          <div
+            key={field.key}
+            className="bg-white/[0.04] border border-white/10 rounded-2xl p-5"
+          >
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
+              <field.icon className="w-4 h-4 text-accent-500" />
+              {field.label}
+            </label>
+
+            <input
+              type="text"
+              value={form[field.key]}
+              placeholder={field.placeholder}
+              onChange={(e) =>
+                handleChange(field.key, e.target.value)
+              }
+              className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-accent-500 focus:outline-none transition"
+            />
+          </div>
+        ))}
+      </div>
     </AdminLayout>
   );
 }
