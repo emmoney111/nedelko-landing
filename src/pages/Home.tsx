@@ -1,4 +1,3 @@
-```tsx
 import { useEffect, useState } from 'react';
 import {
   Recycle,
@@ -27,11 +26,36 @@ import {
 
 import { usePrices } from '../lib/prices';
 import { useContacts } from '../lib/contacts';
-import {
-  DEFAULT_CONTACTS,
-  type ContactsData,
-} from '../lib/contactTypes';
 import type { PriceWithSubs } from '../lib/types';
+
+export interface ContactsData {
+  orgName: string;
+  addrPyatigorsk: string;
+  addrMinvody: string;
+  phone1: string;
+  phone2: string;
+  email: string;
+  hours: string;
+  whatsapp: string;
+  telegram: string;
+  max: string;
+}
+
+export const DEFAULT_CONTACTS: ContactsData = {
+  orgName: 'ИП «Неделько»',
+  addrPyatigorsk:
+    'г. Пятигорск, пос. Горячеводский, ул. Ленина 116А',
+  addrMinvody:
+    'г. Минеральные Воды, ул. Московская 23',
+  phone1: '+79280000000',
+  phone2: '+79887419359',
+  email: 'KMV-LOM@mail.ru',
+  hours:
+    'Пн–Пт 08:00–17:00, Сб 08:00–14:00, Вс — выходной',
+  whatsapp: '+79280000000',
+  telegram: '+79280000000',
+  max: '+79887419359',
+};
 
 export interface SettingsData {
   siteName: string;
@@ -42,7 +66,8 @@ export interface SettingsData {
 
 export const DEFAULT_SETTINGS: SettingsData = {
   siteName: 'ИП «Неделько»',
-  subtitle: 'Приём металлолома в Пятигорске и Минеральных Водах',
+  subtitle:
+    'Приём металлолома в Пятигорске и Минеральных Водах',
   seoTitle:
     'ИП «Неделько» — Приём металлолома в Пятигорске и Минеральных Водах',
   seoDescription:
@@ -151,7 +176,8 @@ function useReveal() {
       }
     );
 
-    const elements = document.querySelectorAll('.reveal');
+    const elements =
+      document.querySelectorAll('.reveal');
 
     elements.forEach((element) => {
       observer.observe(element);
@@ -208,10 +234,18 @@ function formatPhone(phone: string) {
   const second = digits.slice(7, 9);
   const third = digits.slice(9, 11);
 
-  return '+7 (' + code + ') ' + first + '-' + second + '-' + third;
+  return `+7 (${code}) ${first}-${second}-${third}`;
 }
 
-function Header({ contacts }: { contacts: ContactsData }) {
+function cleanPhone(phone: string) {
+  return phone.replace(/\D/g, '');
+}
+
+function Header({
+  contacts,
+}: {
+  contacts: ContactsData;
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const active = useActiveSection();
@@ -241,9 +275,7 @@ function Header({ contacts }: { contacts: ContactsData }) {
           href="#hero"
           className="flex items-center gap-3 shrink-0 group"
         >
-          <div className="relative">
-            <Recycle className="w-9 h-9 text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
-          </div>
+          <Recycle className="w-9 h-9 text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
 
           <div className="leading-tight">
             <div className="font-display text-lg sm:text-xl font-bold tracking-wide text-white">
@@ -282,9 +314,11 @@ function Header({ contacts }: { contacts: ContactsData }) {
           </a>
 
           <button
-            onClick={() => setOpen(!open)}
+            type="button"
+            onClick={() => setOpen((value) => !value)}
             className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition"
             aria-label="Меню"
+            aria-expanded={open}
           >
             {open ? (
               <X className="w-6 h-6" />
@@ -331,7 +365,11 @@ function Header({ contacts }: { contacts: ContactsData }) {
   );
 }
 
-function Hero({ contacts }: { contacts: ContactsData }) {
+function Hero({
+  contacts,
+}: {
+  contacts: ContactsData;
+}) {
   return (
     <section
       id="hero"
@@ -367,8 +405,9 @@ function Hero({ contacts }: { contacts: ContactsData }) {
             className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl animate-fade-up"
             style={{ animationDelay: '0.1s' }}
           >
-            Принимаем чёрный и цветной металл по лучшим ценам
-            в регионе. Честное взвешивание, моментальная оплата.
+            Принимаем чёрный и цветной металл по лучшим
+            ценам в регионе. Честное взвешивание,
+            моментальная оплата.
           </p>
 
           <div
@@ -394,6 +433,7 @@ function Hero({ contacts }: { contacts: ContactsData }) {
                 className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2.5 rounded-xl"
               >
                 <feature.icon className="w-5 h-5 text-accent-500" />
+
                 <span className="text-sm font-medium text-gray-200">
                   {feature.text}
                 </span>
@@ -442,7 +482,9 @@ function PricesAndMaterials({
   loading: boolean;
   error: string | null;
 }) {
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(
+    null
+  );
 
   const toggle = (index: number) => {
     setExpanded((current) =>
@@ -482,7 +524,8 @@ function PricesAndMaterials({
 
               {error && !loading && (
                 <div className="px-6 py-10 text-center text-red-400">
-                  Не удалось загрузить цены. Попробуйте позже.
+                  Не удалось загрузить цены. Попробуйте
+                  позже.
                 </div>
               )}
 
@@ -495,7 +538,7 @@ function PricesAndMaterials({
                     ];
 
                   const hasSubItems =
-                    item.subItems &&
+                    Array.isArray(item.subItems) &&
                     item.subItems.length > 0;
 
                   const isOpen = expanded === index;
@@ -515,11 +558,13 @@ function PricesAndMaterials({
                             ? 'cursor-pointer hover:bg-accent-500/5'
                             : 'hover:bg-accent-500/5'
                         }`}
-                        onClick={() =>
-                          hasSubItems && toggle(index)
-                        }
+                        onClick={() => {
+                          if (hasSubItems) {
+                            toggle(index);
+                          }
+                        }}
                       >
-                        <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-accent-500/15 flex items-center justify-center shrink-0">
                             <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent-500" />
                           </div>
@@ -530,7 +575,7 @@ function PricesAndMaterials({
 
                           {hasSubItems && (
                             <ChevronDown
-                              className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
+                              className={`w-5 h-5 text-gray-400 transition-transform duration-300 shrink-0 ${
                                 isOpen
                                   ? 'rotate-180'
                                   : ''
@@ -539,7 +584,7 @@ function PricesAndMaterials({
                           )}
                         </div>
 
-                        <div className="text-right">
+                        <div className="text-right shrink-0 ml-3">
                           <span className="font-display text-2xl sm:text-3xl font-bold text-accent-500">
                             {item.price}
                           </span>
@@ -571,6 +616,7 @@ function PricesAndMaterials({
 
                                   <span className="font-display text-base font-bold text-accent-400">
                                     {subItem.price}
+
                                     <span className="text-xs text-gray-500 ml-1">
                                       ₽/кг
                                     </span>
@@ -584,13 +630,24 @@ function PricesAndMaterials({
                     </div>
                   );
                 })}
+
+              {!loading &&
+                !error &&
+                prices.length === 0 && (
+                  <div className="px-6 py-10 text-center text-gray-400">
+                    Цены пока не добавлены.
+                  </div>
+                )}
             </div>
 
             <p className="mt-4 text-sm text-gray-500 flex items-start gap-2">
               <Clock className="w-4 h-4 mt-0.5 shrink-0 text-accent-500/70" />
-              Цены обновляются ежедневно. Итоговая стоимость
-              зависит от чистоты и объёма металла. Позвоните для
-              уточнения.
+
+              <span>
+                Цены обновляются ежедневно. Итоговая стоимость
+                зависит от чистоты и объёма металла. Позвоните
+                для уточнения.
+              </span>
             </p>
           </div>
 
@@ -700,10 +757,9 @@ function MiniMap({
   label: string;
   query: string;
 }) {
-  const src =
-    `https://maps.google.com/maps?q=${encodeURIComponent(
-      query
-    )}&z=14&output=embed`;
+  const src = `https://maps.google.com/maps?q=${encodeURIComponent(
+    query
+  )}&z=14&output=embed`;
 
   return (
     <div className="rounded-xl overflow-hidden border border-white/10 h-44 sm:h-48 bg-gray-900">
@@ -822,42 +878,9 @@ function Contacts({
                 </h3>
               </div>
 
-              <ul className="space-y-3">
-                {[
-                  {
-                    day: 'Пн – Пт',
-                    time: '08:00 – 17:00',
-                  },
-                  {
-                    day: 'Сб',
-                    time: '08:00 – 14:00',
-                  },
-                  {
-                    day: 'Вс',
-                    time: 'Выходной',
-                    off: true,
-                  },
-                ].map((day) => (
-                  <li
-                    key={day.day}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="text-gray-300">
-                      {day.day}
-                    </span>
-
-                    <span
-                      className={`font-medium ${
-                        day.off
-                          ? 'text-gray-500'
-                          : 'text-white'
-                      }`}
-                    >
-                      {day.time}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                {contacts.hours}
+              </p>
             </div>
 
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
@@ -893,9 +916,8 @@ function Contacts({
 
               <div className="flex flex-wrap gap-3">
                 <a
-                  href={`https://wa.me/${contacts.whatsapp.replace(
-                    '+',
-                    ''
+                  href={`https://wa.me/${cleanPhone(
+                    contacts.whatsapp
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -908,9 +930,8 @@ function Contacts({
                 </a>
 
                 <a
-                  href={`https://t.me/${contacts.telegram.replace(
-                    '+',
-                    ''
+                  href={`https://t.me/${cleanPhone(
+                    contacts.telegram
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -923,9 +944,8 @@ function Contacts({
                 </a>
 
                 <a
-                  href={`https://max.ru/${contacts.max.replace(
-                    '+',
-                    ''
+                  href={`https://max.ru/${cleanPhone(
+                    contacts.max
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -955,10 +975,15 @@ function Contacts({
   );
 }
 
-function CTA({ contacts }: { contacts: ContactsData }) {
+function CTA({
+  contacts,
+}: {
+  contacts: ContactsData;
+}) {
   return (
     <section className="relative py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-accent-600 via-accent-500 to-accent-600" />
+
       <div className="absolute inset-0 bg-grid opacity-20" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
@@ -967,8 +992,8 @@ function CTA({ contacts }: { contacts: ContactsData }) {
         </h2>
 
         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-          Позвоните прямо сейчас и узнайте цену вашего металла
-          за 2 минуты.
+          Позвоните прямо сейчас и узнайте цену вашего
+          металла за 2 минуты.
         </p>
 
         <a
@@ -983,7 +1008,11 @@ function CTA({ contacts }: { contacts: ContactsData }) {
   );
 }
 
-function Footer({ contacts }: { contacts: ContactsData }) {
+function Footer({
+  contacts,
+}: {
+  contacts: ContactsData;
+}) {
   return (
     <footer className="bg-black border-t border-white/10 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1004,7 +1033,10 @@ function Footer({ contacts }: { contacts: ContactsData }) {
 
           <div className="flex items-center gap-2 text-accent-500 font-medium">
             <ShieldCheck className="w-5 h-5" />
-            <span>Работаем честно и прозрачно!</span>
+
+            <span>
+              Работаем честно и прозрачно!
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -1025,9 +1057,8 @@ function Footer({ contacts }: { contacts: ContactsData }) {
             </a>
 
             <a
-              href={`https://wa.me/${contacts.whatsapp.replace(
-                '+',
-                ''
+              href={`https://wa.me/${cleanPhone(
+                contacts.whatsapp
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -1038,9 +1069,8 @@ function Footer({ contacts }: { contacts: ContactsData }) {
             </a>
 
             <a
-              href={`https://t.me/${contacts.telegram.replace(
-                '+',
-                ''
+              href={`https://t.me/${cleanPhone(
+                contacts.telegram
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -1051,9 +1081,8 @@ function Footer({ contacts }: { contacts: ContactsData }) {
             </a>
 
             <a
-              href={`https://max.ru/${contacts.max.replace(
-                '+',
-                ''
+              href={`https://max.ru/${cleanPhone(
+                contacts.max
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -1123,4 +1152,3 @@ export default function Home() {
     </div>
   );
 }
-```
