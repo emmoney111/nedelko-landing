@@ -13,7 +13,11 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { DEFAULT_CONTACTS, type ContactsData } from './Home';
+import {
+  DEFAULT_CONTACTS,
+  type ContactsData,
+} from '../lib/contacts';
+
 import { updateContacts } from '../lib/contacts';
 
 const FIELDS: {
