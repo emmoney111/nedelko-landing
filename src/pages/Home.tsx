@@ -23,7 +23,7 @@ import {
   Mail,
   Maximize2,
 } from 'lucide-react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useContacts } from '../lib/contacts';;
 import { usePrices } from '../lib/prices';
 import type { PriceWithSubs } from '../lib/types';
 
@@ -716,24 +716,26 @@ function Footer({ contacts }: { contacts: ContactsData }) {
 
 export default function Home() {
   useReveal();
+
   const { status: pricesStatus, data: prices, error: pricesError } = usePrices();
-  const [contacts] = useLocalStorage<ContactsData>('admin_contacts', DEFAULT_CONTACTS);
+  const {
+    data: contactsFromDb,
+    loading: contactsLoading,
+    error: contactsError,
+  } = useContacts();
+
+  const contacts = contactsFromDb ?? DEFAULT_CONTACTS;
+
+  if (contactsLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-gray-400">Загрузка сайта…</div>
+      </div>
+    );
+  }
+
+  if (contactsError) {
+    console.error('Ошибка загрузки контактов:', contactsError);
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <Header contacts={contacts} />
-      <main>
-        <Hero contacts={contacts} />
-        <PricesAndMaterials 
-          prices={prices ?? []} 
-          loading={pricesStatus === 'loading'} 
-          error={pricesError} 
-        />
-        <Advantages />
-        <Contacts contacts={contacts} />
-        <CTA contacts={contacts} />
-      </main>
-      <Footer contacts={contacts} />
-    </div>
-  );
-}
