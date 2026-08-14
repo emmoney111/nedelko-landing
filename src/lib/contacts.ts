@@ -17,21 +17,6 @@ type ContactRow = {
   updated_at: string;
 };
 
-function rowToContacts(row: ContactRow): ContactsData {
-  return {
-    orgName: row.org_name,
-    addrPyatigorsk: row.addr_pyatigorsk,
-    addrMinvody: row.addr_minvody,
-    phone1: row.phone1,
-    phone2: row.phone2,
-    email: row.email,
-    hours: row.hours,
-    whatsapp: row.whatsapp,
-    telegram: row.telegram,
-    max: row.max,
-  };
-}
-
 export function useContacts() {
   const [data, setData] = useState<ContactsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +45,21 @@ export function useContacts() {
       return;
     }
 
-    setData(rowToContacts(row as ContactRow));
+    const contact = row as ContactRow;
+
+    setData({
+      orgName: contact.org_name,
+      addrPyatigorsk: contact.addr_pyatigorsk,
+      addrMinvody: contact.addr_minvody,
+      phone1: contact.phone1,
+      phone2: contact.phone2,
+      email: contact.email,
+      hours: contact.hours,
+      whatsapp: contact.whatsapp,
+      telegram: contact.telegram,
+      max: contact.max,
+    });
+
     setLoading(false);
   }, []);
 
@@ -76,7 +75,7 @@ export function useContacts() {
   };
 }
 
-export async function updateContacts(contacts: ContactsData) {
+export async function updateContacts(data: ContactsData) {
   const { data: existing, error: findError } = await supabase
     .from('contacts')
     .select('id')
@@ -88,16 +87,16 @@ export async function updateContacts(contacts: ContactsData) {
   }
 
   const payload = {
-    org_name: contacts.orgName,
-    addr_pyatigorsk: contacts.addrPyatigorsk,
-    addr_minvody: contacts.addrMinvody,
-    phone1: contacts.phone1,
-    phone2: contacts.phone2,
-    email: contacts.email,
-    hours: contacts.hours,
-    whatsapp: contacts.whatsapp,
-    telegram: contacts.telegram,
-    max: contacts.max,
+    org_name: data.orgName,
+    addr_pyatigorsk: data.addrPyatigorsk,
+    addr_minvody: data.addrMinvody,
+    phone1: data.phone1,
+    phone2: data.phone2,
+    email: data.email,
+    hours: data.hours,
+    whatsapp: data.whatsapp,
+    telegram: data.telegram,
+    max: data.max,
     updated_at: new Date().toISOString(),
   };
 
@@ -118,42 +117,5 @@ export async function updateContacts(contacts: ContactsData) {
     if (error) {
       throw error;
     }
-  }
-}
-export async function updateContacts(data: ContactsData) {
-  const { data: existing, error: findError } = await supabase
-    .from('contacts')
-    .select('id')
-    .limit(1)
-    .maybeSingle();
-
-  if (findError) throw findError;
-
-  const payload = {
-    org_name: data.orgName,
-    addr_pyatigorsk: data.addrPyatigorsk,
-    addr_minvody: data.addrMinvody,
-    phone1: data.phone1,
-    phone2: data.phone2,
-    email: data.email,
-    hours: data.hours,
-    whatsapp: data.whatsapp,
-    telegram: data.telegram,
-    max: data.max,
-  };
-
-  if (existing) {
-    const { error } = await supabase
-      .from('contacts')
-      .update(payload)
-      .eq('id', existing.id);
-
-    if (error) throw error;
-  } else {
-    const { error } = await supabase
-      .from('contacts')
-      .insert(payload);
-
-    if (error) throw error;
   }
 }
