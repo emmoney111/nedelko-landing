@@ -10,29 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
     <title>ИП «Неделько» — Приём металлолома в Пятигорске и Минеральных Водах</title>
     <script>
-      // SPA redirect receiver: 404.html redirects here with ?/path.
-      // Restore the original path so the React router sees the correct URL.
+      // SPA redirect fallback for static hosting (GitHub Pages, Timeweb).
+      // When a user navigates directly to /admin/prices, the static host
+      // serves 404.html. We redirect to the same path via index.html so
+      // the React router can handle the route client-side.
       (function () {
+        var pathSegmentsToKeep = 0;
         var l = window.location;
-        if (l.search.indexOf('?/') === 0) {
-          var decoded = l.search
-            .slice(1)
-            .split('&')
-            .map(function (s) { return s.replace(/~and~/g, '&'); });
-          var path = decoded[0];
-          var search = decoded.slice(1).join('&');
-          history.replaceState(
-            null,
-            '',
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            (path ? path : '/') + (search ? '?' + search : '') + l.hash
-          );
-        }
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+          l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
       })();
     </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
