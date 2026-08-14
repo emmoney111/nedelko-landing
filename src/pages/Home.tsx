@@ -25,7 +25,11 @@ import {
 } from 'lucide-react';
 
 import { usePrices } from '../lib/prices';
-import { useContacts } from '../lib/contacts';
+import {
+  DEFAULT_CONTACTS,
+  type ContactsData,
+  useContacts,
+} from '../lib/contacts';;
 import type { PriceWithSubs } from '../lib/types';
 
 export interface ContactsData {
