@@ -26,12 +26,11 @@ import {
 } from 'lucide-react';
 
 import { usePrices } from '../lib/prices';
+import { useContacts } from '../lib/contacts';
 import {
-  useContacts,
   DEFAULT_CONTACTS,
   type ContactsData,
-} from '../lib/contacts';
-
+} from '../lib/contactTypes';
 import type { PriceWithSubs } from '../lib/types';
 
 export interface SettingsData {
@@ -152,11 +151,15 @@ function useReveal() {
       }
     );
 
-    const els = document.querySelectorAll('.reveal');
+    const elements = document.querySelectorAll('.reveal');
 
-    els.forEach((el) => observer.observe(el));
+    elements.forEach((element) => {
+      observer.observe(element);
+    });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 }
 
@@ -178,14 +181,16 @@ function useActiveSection() {
     );
 
     NAV.forEach((item) => {
-      const el = document.getElementById(item.id);
+      const element = document.getElementById(item.id);
 
-      if (el) {
-        observer.observe(el);
+      if (element) {
+        observer.observe(element);
       }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return active;
@@ -194,21 +199,16 @@ function useActiveSection() {
 function formatPhone(phone: string) {
   const digits = phone.replace(/\D/g, '');
 
-  if (digits.length === 11) {
-    return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
+  if (digits.length !== 11) {
+    return phone;
   }
 
-  return phone;
-}
+  const code = digits.slice(1, 4);
+  const first = digits.slice(4, 7);
+  const second = digits.slice(7, 9);
+  const third = digits.slice(9, 11);
 
-  if (digits.length === 11) {
-    return `+7 (${digits.slice(1, 4)}) ${digits.slice(
-      4,
-      7
-    )}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
-  }
-
-  return phone;
+  return '+7 (' + code + ') ' + first + '-' + second + '-' + third;
 }
 
 function Header({ contacts }: { contacts: ContactsData }) {
@@ -223,7 +223,9 @@ function Header({ contacts }: { contacts: ContactsData }) {
 
     window.addEventListener('scroll', onScroll);
 
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   return (
@@ -365,9 +367,8 @@ function Hero({ contacts }: { contacts: ContactsData }) {
             className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl animate-fade-up"
             style={{ animationDelay: '0.1s' }}
           >
-            Принимаем чёрный и цветной металл по лучшим
-            ценам в регионе. Честное взвешивание,
-            моментальная оплата.
+            Принимаем чёрный и цветной металл по лучшим ценам
+            в регионе. Честное взвешивание, моментальная оплата.
           </p>
 
           <div
@@ -375,9 +376,18 @@ function Hero({ contacts }: { contacts: ContactsData }) {
             style={{ animationDelay: '0.2s' }}
           >
             {[
-              { icon: TrendingUp, text: 'Высокие цены' },
-              { icon: Scale, text: 'Честное взвешивание' },
-              { icon: Wallet, text: 'Моментальная оплата' },
+              {
+                icon: TrendingUp,
+                text: 'Высокие цены',
+              },
+              {
+                icon: Scale,
+                text: 'Честное взвешивание',
+              },
+              {
+                icon: Wallet,
+                text: 'Моментальная оплата',
+              },
             ].map((feature) => (
               <div
                 key={feature.text}
@@ -435,7 +445,9 @@ function PricesAndMaterials({
   const [expanded, setExpanded] = useState<number | null>(null);
 
   const toggle = (index: number) => {
-    setExpanded(expanded === index ? null : index);
+    setExpanded((current) =>
+      current === index ? null : index
+    );
   };
 
   return (
@@ -445,7 +457,10 @@ function PricesAndMaterials({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-12">
-          <div id="prices-block" className="reveal">
+          <div
+            id="prices-block"
+            className="reveal"
+          >
             <div className="inline-flex items-center gap-2 text-accent-500 text-sm font-semibold uppercase tracking-wider mb-3">
               <TrendingUp className="w-4 h-4" />
               Прайс-лист
@@ -475,7 +490,9 @@ function PricesAndMaterials({
                 !error &&
                 prices.map((item, index) => {
                   const Icon =
-                    PRICE_ICONS[index % PRICE_ICONS.length];
+                    PRICE_ICONS[
+                      index % PRICE_ICONS.length
+                    ];
 
                   const hasSubItems =
                     item.subItems &&
@@ -514,7 +531,9 @@ function PricesAndMaterials({
                           {hasSubItems && (
                             <ChevronDown
                               className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
-                                isOpen ? 'rotate-180' : ''
+                                isOpen
+                                  ? 'rotate-180'
+                                  : ''
                               }`}
                             />
                           )}
@@ -540,24 +559,25 @@ function PricesAndMaterials({
                           }`}
                         >
                           <div className="pl-12 sm:pl-16 pr-5 sm:pr-6 pb-3 pt-1 space-y-1">
-                            {item.subItems.map((sub) => (
-                              <div
-                                key={sub.id}
-                                className="flex items-center justify-between py-2 px-3 rounded-lg bg-black/30 border border-white/5"
-                              >
-                                <span className="text-sm text-gray-300">
-                                  {sub.name}
-                                </span>
-
-                                <span className="font-display text-base font-bold text-accent-400">
-                                  {sub.price}
-
-                                  <span className="text-xs text-gray-500 ml-1">
-                                    ₽/кг
+                            {item.subItems.map(
+                              (subItem) => (
+                                <div
+                                  key={subItem.id}
+                                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-black/30 border border-white/5"
+                                >
+                                  <span className="text-sm text-gray-300">
+                                    {subItem.name}
                                   </span>
-                                </span>
-                              </div>
-                            ))}
+
+                                  <span className="font-display text-base font-bold text-accent-400">
+                                    {subItem.price}
+                                    <span className="text-xs text-gray-500 ml-1">
+                                      ₽/кг
+                                    </span>
+                                  </span>
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       )}
@@ -568,7 +588,9 @@ function PricesAndMaterials({
 
             <p className="mt-4 text-sm text-gray-500 flex items-start gap-2">
               <Clock className="w-4 h-4 mt-0.5 shrink-0 text-accent-500/70" />
-              Цены обновляются ежедневно. Итоговая стоимость зависит от чистоты и объёма металла. Позвоните для уточнения.
+              Цены обновляются ежедневно. Итоговая стоимость
+              зависит от чистоты и объёма металла. Позвоните для
+              уточнения.
             </p>
           </div>
 
@@ -678,9 +700,10 @@ function MiniMap({
   label: string;
   query: string;
 }) {
-  const src = `https://maps.google.com/maps?q=${encodeURIComponent(
-    query
-  )}&z=14&output=embed`;
+  const src =
+    `https://maps.google.com/maps?q=${encodeURIComponent(
+      query
+    )}&z=14&output=embed`;
 
   return (
     <div className="rounded-xl overflow-hidden border border-white/10 h-44 sm:h-48 bg-gray-900">
@@ -800,31 +823,40 @@ function Contacts({
               </div>
 
               <ul className="space-y-3">
-                <li className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300">
-                    Пн – Пт
-                  </span>
+                {[
+                  {
+                    day: 'Пн – Пт',
+                    time: '08:00 – 17:00',
+                  },
+                  {
+                    day: 'Сб',
+                    time: '08:00 – 14:00',
+                  },
+                  {
+                    day: 'Вс',
+                    time: 'Выходной',
+                    off: true,
+                  },
+                ].map((day) => (
+                  <li
+                    key={day.day}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="text-gray-300">
+                      {day.day}
+                    </span>
 
-                  <span className="font-medium text-white">
-                    08:00 – 17:00
-                  </span>
-                </li>
-
-                <li className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300">Сб</span>
-
-                  <span className="font-medium text-white">
-                    08:00 – 14:00
-                  </span>
-                </li>
-
-                <li className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300">Вс</span>
-
-                  <span className="font-medium text-gray-500">
-                    Выходной
-                  </span>
-                </li>
+                    <span
+                      className={`font-medium ${
+                        day.off
+                          ? 'text-gray-500'
+                          : 'text-white'
+                      }`}
+                    >
+                      {day.time}
+                    </span>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -935,8 +967,8 @@ function CTA({ contacts }: { contacts: ContactsData }) {
         </h2>
 
         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-          Позвоните прямо сейчас и узнайте цену вашего
-          металла за 2 минуты.
+          Позвоните прямо сейчас и узнайте цену вашего металла
+          за 2 минуты.
         </p>
 
         <a
@@ -951,11 +983,7 @@ function CTA({ contacts }: { contacts: ContactsData }) {
   );
 }
 
-function Footer({
-  contacts,
-}: {
-  contacts: ContactsData;
-}) {
+function Footer({ contacts }: { contacts: ContactsData }) {
   return (
     <footer className="bg-black border-t border-white/10 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1056,7 +1084,8 @@ export default function Home() {
     error: contactsError,
   } = useContacts();
 
-  const contacts = contactsFromDb ?? DEFAULT_CONTACTS;
+  const contacts =
+    contactsFromDb ?? DEFAULT_CONTACTS;
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
