@@ -1,3 +1,4 @@
+```tsx
 import { useEffect, useState } from 'react';
 import {
   Recycle,
@@ -23,22 +24,15 @@ import {
   Mail,
   Maximize2,
 } from 'lucide-react';
-import { usePrices } from '../lib/prices';
-import { useContacts } from '../lib/contacts';
-import type { PriceWithSubs } from '../lib/types';
 
-export interface ContactsData {
-  orgName: string;
-  addrPyatigorsk: string;
-  addrMinvody: string;
-  phone1: string;
-  phone2: string;
-  email: string;
-  hours: string;
-  whatsapp: string;
-  telegram: string;
-  max: string;
-}
+import { usePrices } from '../lib/prices';
+import {
+  useContacts,
+  DEFAULT_CONTACTS,
+  type ContactsData,
+} from '../lib/contacts';
+
+import type { PriceWithSubs } from '../lib/types';
 
 export interface SettingsData {
   siteName: string;
@@ -46,19 +40,6 @@ export interface SettingsData {
   seoTitle: string;
   seoDescription: string;
 }
-
-export const DEFAULT_CONTACTS: ContactsData = {
-  orgName: 'ИП «Неделько»',
-  addrPyatigorsk: 'г. Пятигорск, пос. Горячеводский, ул. Ленина 116А',
-  addrMinvody: 'г. Минеральные Воды, ул. Московская 23',
-  phone1: '+79280000000',
-  phone2: '+79887419359',
-  email: 'KMV-LOM@mail.ru',
-  hours: 'Пн–Пт 08:00–17:00, Сб 08:00–14:00, Вс — выходной',
-  whatsapp: '+79280000000',
-  telegram: '+79280000000',
-  max: '+79887419359',
-};
 
 export const DEFAULT_SETTINGS: SettingsData = {
   siteName: 'ИП «Неделько»',
@@ -172,6 +153,7 @@ function useReveal() {
     );
 
     const els = document.querySelectorAll('.reveal');
+
     els.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
@@ -195,8 +177,8 @@ function useActiveSection() {
       }
     );
 
-    NAV.forEach((n) => {
-      const el = document.getElementById(n.id);
+    NAV.forEach((item) => {
+      const el = document.getElementById(item.id);
 
       if (el) {
         observer.observe(el);
@@ -213,10 +195,10 @@ function formatPhone(phone: string) {
   const digits = phone.replace(/\D/g, '');
 
   if (digits.length === 11) {
-    return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(
-      7,
-      9
-    )}-${digits.slice(9, 11)}`;
+    return `+7 (${digits.slice(1, 4)}) ${digits.slice(
+      4,
+      7
+    )}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
   }
 
   return phone;
@@ -246,7 +228,10 @@ function Header({ contacts }: { contacts: ContactsData }) {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
-        <a href="#hero" className="flex items-center gap-3 shrink-0 group">
+        <a
+          href="#hero"
+          className="flex items-center gap-3 shrink-0 group"
+        >
           <div className="relative">
             <Recycle className="w-9 h-9 text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
           </div>
@@ -373,8 +358,9 @@ function Hero({ contacts }: { contacts: ContactsData }) {
             className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl animate-fade-up"
             style={{ animationDelay: '0.1s' }}
           >
-            Принимаем чёрный и цветной металл по лучшим ценам в регионе.
-            Честное взвешивание, моментальная оплата.
+            Принимаем чёрный и цветной металл по лучшим
+            ценам в регионе. Честное взвешивание,
+            моментальная оплата.
           </p>
 
           <div
@@ -385,14 +371,14 @@ function Hero({ contacts }: { contacts: ContactsData }) {
               { icon: TrendingUp, text: 'Высокие цены' },
               { icon: Scale, text: 'Честное взвешивание' },
               { icon: Wallet, text: 'Моментальная оплата' },
-            ].map((f) => (
+            ].map((feature) => (
               <div
-                key={f.text}
+                key={feature.text}
                 className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2.5 rounded-xl"
               >
-                <f.icon className="w-5 h-5 text-accent-500" />
+                <feature.icon className="w-5 h-5 text-accent-500" />
                 <span className="text-sm font-medium text-gray-200">
-                  {f.text}
+                  {feature.text}
                 </span>
               </div>
             ))}
@@ -446,7 +432,10 @@ function PricesAndMaterials({
   };
 
   return (
-    <section id="prices" className="relative py-20 sm:py-28 bg-grid">
+    <section
+      id="prices"
+      className="relative py-20 sm:py-28 bg-grid"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-12">
           <div id="prices-block" className="reveal">
@@ -477,21 +466,21 @@ function PricesAndMaterials({
 
               {!loading &&
                 !error &&
-                prices.map((item, i) => {
+                prices.map((item, index) => {
                   const Icon =
-                    PRICE_ICONS[i % PRICE_ICONS.length];
+                    PRICE_ICONS[index % PRICE_ICONS.length];
 
                   const hasSubItems =
                     item.subItems &&
                     item.subItems.length > 0;
 
-                  const isOpen = expanded === i;
+                  const isOpen = expanded === index;
 
                   return (
                     <div
                       key={item.id}
                       className={`transition-colors ${
-                        i !== prices.length - 1
+                        index !== prices.length - 1
                           ? 'border-b border-white/5'
                           : ''
                       }`}
@@ -503,7 +492,7 @@ function PricesAndMaterials({
                             : 'hover:bg-accent-500/5'
                         }`}
                         onClick={() =>
-                          hasSubItems && toggle(i)
+                          hasSubItems && toggle(index)
                         }
                       >
                         <div className="flex items-center gap-3 sm:gap-4">
@@ -555,6 +544,7 @@ function PricesAndMaterials({
 
                                 <span className="font-display text-base font-bold text-accent-400">
                                   {sub.price}
+
                                   <span className="text-xs text-gray-500 ml-1">
                                     ₽/кг
                                   </span>
@@ -571,8 +561,7 @@ function PricesAndMaterials({
 
             <p className="mt-4 text-sm text-gray-500 flex items-start gap-2">
               <Clock className="w-4 h-4 mt-0.5 shrink-0 text-accent-500/70" />
-              Цены обновляются ежедневно. Итоговая стоимость зависит от
-              чистоты и объёма металла. Позвоните для уточнения.
+              Цены обновляются ежедневно. Итоговая стоимость зависит от чистоты и объёма металла. Позвоните для уточнения.
             </p>
           </div>
 
@@ -594,21 +583,21 @@ function PricesAndMaterials({
             </h2>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              {MATERIALS.map((m) => (
+              {MATERIALS.map((material) => (
                 <div
-                  key={m.name}
+                  key={material.name}
                   className="group bg-white/[0.04] border border-white/10 rounded-2xl p-5 transition-all duration-300 hover:bg-accent-500/10 hover:border-accent-500/40 hover:-translate-y-1"
                 >
                   <div className="w-12 h-12 rounded-xl bg-accent-500/15 group-hover:bg-accent-500 group-hover:rotate-6 flex items-center justify-center mb-4 transition-all duration-300">
-                    <m.icon className="w-6 h-6 text-accent-500 group-hover:text-white transition-colors" />
+                    <material.icon className="w-6 h-6 text-accent-500 group-hover:text-white transition-colors" />
                   </div>
 
                   <h3 className="font-semibold text-lg mb-1 text-white">
-                    {m.name}
+                    {material.name}
                   </h3>
 
                   <p className="text-sm text-gray-400">
-                    {m.desc}
+                    {material.desc}
                   </p>
                 </div>
               ))}
@@ -644,27 +633,27 @@ function Advantages() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {ADVANTAGES.map((a, i) => (
+          {ADVANTAGES.map((advantage, index) => (
             <div
-              key={a.title}
+              key={advantage.title}
               className="reveal group relative bg-white/[0.04] border border-white/10 rounded-2xl p-6 sm:p-7 transition-all duration-300 hover:bg-white/[0.07] hover:border-accent-500/30 hover:-translate-y-1.5"
               style={{
-                transitionDelay: `${i * 0.08}s`,
+                transitionDelay: `${index * 0.08}s`,
               }}
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-accent-500/5 rounded-full blur-2xl group-hover:bg-accent-500/15 transition-colors" />
 
               <div className="relative">
                 <div className="w-14 h-14 rounded-2xl bg-accent-500/15 group-hover:bg-accent-500 flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110">
-                  <a.icon className="w-7 h-7 text-accent-500 group-hover:text-white transition-colors" />
+                  <advantage.icon className="w-7 h-7 text-accent-500 group-hover:text-white transition-colors" />
                 </div>
 
                 <h3 className="font-display text-xl font-bold mb-2 text-white">
-                  {a.title}
+                  {advantage.title}
                 </h3>
 
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  {a.text}
+                  {advantage.text}
                 </p>
               </div>
             </div>
@@ -742,31 +731,32 @@ function Contacts({
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 reveal">
             <div className="grid sm:grid-cols-2 gap-6">
-              {addresses.map((a) => (
+              {addresses.map((address) => (
                 <div
-                  key={a.city}
+                  key={address.city}
                   className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-accent-500/30"
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-5 h-5 text-accent-500" />
+
                     <h3 className="font-display text-xl font-bold text-white">
-                      {a.city}
+                      {address.city}
                     </h3>
                   </div>
 
                   <p className="text-gray-400 text-sm mb-4">
-                    {a.addr}
+                    {address.addr}
                   </p>
 
                   <MiniMap
-                    label={a.mapLabel}
-                    query={a.mapQuery}
+                    label={address.mapLabel}
+                    query={address.mapQuery}
                   />
 
                   <div className="flex flex-col sm:flex-row gap-3 mt-4">
                     <a
                       href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                        a.mapQuery
+                        address.mapQuery
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -796,19 +786,45 @@ function Contacts({
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-5 h-5 text-accent-500" />
+
                 <h3 className="font-display text-xl font-bold text-white">
                   Режим работы
                 </h3>
               </div>
 
-              <div className="text-sm text-gray-300 leading-relaxed">
-                {contacts.hours}
-              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">
+                    Пн – Пт
+                  </span>
+
+                  <span className="font-medium text-white">
+                    08:00 – 17:00
+                  </span>
+                </li>
+
+                <li className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">Сб</span>
+
+                  <span className="font-medium text-white">
+                    08:00 – 14:00
+                  </span>
+                </li>
+
+                <li className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">Вс</span>
+
+                  <span className="font-medium text-gray-500">
+                    Выходной
+                  </span>
+                </li>
+              </ul>
             </div>
 
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Phone className="w-5 h-5 text-accent-500" />
+
                 <h3 className="font-display text-xl font-bold text-white">
                   Контакты
                 </h3>
@@ -900,11 +916,7 @@ function Contacts({
   );
 }
 
-function CTA({
-  contacts,
-}: {
-  contacts: ContactsData;
-}) {
+function CTA({ contacts }: { contacts: ContactsData }) {
   return (
     <section className="relative py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-accent-600 via-accent-500 to-accent-600" />
@@ -916,7 +928,8 @@ function CTA({
         </h2>
 
         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-          Позвоните прямо сейчас и узнайте цену вашего металла за 2 минуты.
+          Позвоните прямо сейчас и узнайте цену вашего
+          металла за 2 минуты.
         </p>
 
         <a
@@ -1036,8 +1049,7 @@ export default function Home() {
     error: contactsError,
   } = useContacts();
 
-  const contacts =
-    contactsFromDb ?? DEFAULT_CONTACTS;
+  const contacts = contactsFromDb ?? DEFAULT_CONTACTS;
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -1075,3 +1087,4 @@ export default function Home() {
     </div>
   );
 }
+```
