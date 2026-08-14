@@ -1,42 +1,45 @@
 name: Build and Deploy
 
 on:
-push:
-branches: [ main ]
-workflow_dispatch:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-steps:
-- name: Checkout
-uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-- name: Setup Node
-uses: actions/setup-node@v4
-with:
-node-version: 20
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-- name: Install dependencies
-run: npm install
+      - name: Install dependencies
+        run: npm install
 
-- name: Build
-run: npm run build
+      - name: Build
+        run: npm run build
 
-- name: Deploy to root
-run: |
-# Удаляем всё кроме dist и нужных файлов
-find . -maxdepth 1 ! -name 'dist' ! -name '.git' ! -name '.github' -exec rm -rf {} +
+      - name: Deploy to root
+        run: |
+          # Удаляем всё кроме dist и нужных файлов
+          find . -maxdepth 1 ! -name 'dist' ! -name '.git' ! -name '.github' -exec rm -rf {} +
 
-# Переносим содержимое dist в корень
-cp -r dist/* .
-rm -rf dist
+          # Переносим содержимое dist в корень
+          cp -r dist/* .
+          rm -rf dist
 
-- name: Commit and push
-run: |
-git config --global user.name "github-actions"
-git config --global user.email "github-actions@github.com"
-git add .
-git commit -m "Build production files" || echo "No changes"
-git push
+      - name: Commit and push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "Build production files" || echo "No changes"
+          git push
