@@ -1,6 +1,32 @@
+```tsx
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from './supabase';
-import type { ContactsData } from '../pages/Home';
+
+export interface ContactsData {
+  orgName: string;
+  addrPyatigorsk: string;
+  addrMinvody: string;
+  phone1: string;
+  phone2: string;
+  email: string;
+  hours: string;
+  whatsapp: string;
+  telegram: string;
+  max: string;
+}
+
+export const DEFAULT_CONTACTS: ContactsData = {
+  orgName: 'ИП «Неделько»',
+  addrPyatigorsk: 'г. Пятигорск, пос. Горячеводский, ул. Ленина 116А',
+  addrMinvody: 'г. Минеральные Воды, ул. Московская 23',
+  phone1: '+79280000000',
+  phone2: '+79887419359',
+  email: 'KMV-LOM@mail.ru',
+  hours: 'Пн–Пт 08:00–17:00, Сб 08:00–14:00, Вс — выходной',
+  whatsapp: '+79280000000',
+  telegram: '+79280000000',
+  max: '+79887419359',
+};
 
 type ContactRow = {
   id: string;
@@ -119,3 +145,4 @@ export async function updateContacts(data: ContactsData) {
     }
   }
 }
+```
