@@ -17,12 +17,15 @@ export interface ContactsData {
 
 export const DEFAULT_CONTACTS: ContactsData = {
   orgName: 'ИП «Неделько»',
-  addrPyatigorsk: 'г. Пятигорск, пос. Горячеводский, ул. Ленина 116А',
-  addrMinvody: 'г. Минеральные Воды, ул. Московская 23',
+  addrPyatigorsk:
+    'г. Пятигорск, пос. Горячеводский, ул. Ленина 116А',
+  addrMinvody:
+    'г. Минеральные Воды, ул. Московская 23',
   phone1: '+79280000000',
   phone2: '+79887419359',
   email: 'KMV-LOM@mail.ru',
-  hours: 'Пн–Пт 08:00–17:00, Сб 08:00–14:00, Вс — выходной',
+  hours:
+    'Пн–Пт 08:00–17:00, Сб 08:00–14:00, Вс — выходной',
   whatsapp: '+79280000000',
   telegram: '+79280000000',
   max: '+79887419359',
