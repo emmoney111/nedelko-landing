@@ -2,7 +2,8 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -27,14 +28,14 @@ jobs:
       - name: Build
         run: npm run build
 
-     - name: Deploy to root
-  run: |
-    # Удаляем всё кроме dist и нужных файлов
-    find . -mindepth 1 -maxdepth 1 ! -name 'dist' ! -name '.git' ! -name '.github' -exec rm -rf {} +
+      - name: Deploy to root
+        run: |
+          # Удаляем всё кроме dist и нужных файлов
+          find . -mindepth 1 -maxdepth 1 ! -name 'dist' ! -name '.git' ! -name '.github' -exec rm -rf {} +
 
-    # Переносим содержимое dist в корень
-    cp -r dist/* .
-    rm -rf dist
+          # Переносим содержимое dist в корень
+          cp -r dist/* .
+          rm -rf dist
 
       - name: Commit and push
         run: |
